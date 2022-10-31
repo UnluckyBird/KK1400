@@ -101,7 +101,10 @@
 
     private async Task Answer()
     {
-        await JS.InvokeVoidAsync("displayConfetti");
+        if(count == answer){
+            await JS.InvokeVoidAsync("displayConfetti");
+        }
+        
         state = State.Finished;
     }
 
