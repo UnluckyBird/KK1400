@@ -1,0 +1,122 @@
+﻿@page "/"
+@inject IJSRuntime JS
+<PageTitle>KK1400</PageTitle>
+<div>
+<center>
+    <h1>KK1400</h1>
+
+    @if (state == State.NotStarted)
+    {
+        <button class="btn btn-primary" @onclick="StartGameAsync">Start Spillet</button>
+    }
+    else if (state == State.Started)
+    {
+        <div class="container" style="width:300px; height:300px;">
+            @for (int i = 0; i < grid; i++)
+            {
+                <div class="row" style="height:@(100.0/grid)%;">
+                    @for (int j = 0; j < grid; j++)
+                    {
+                        <div class="col grid-item" style="width:@(100.0/grid)%;">@GetNumber()</div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else if (state == State.Answer)
+    {
+        <p>Hvor mange 14 taller var der?</p>
+        <input @bind="answer" />
+        <br />
+        <br />
+        <button class="btn btn-primary" @onclick="Answer">Svar</button>
+    }
+    else if (state == State.Finished)
+    {
+        <p>Svaret var @count, du svarede @answer</p>
+        @if (count != answer)
+        {
+            <p>Du er @CheckAnswer() fra</p>
+            <h2 style="color: red;">DRIK</h2>
+        }
+        else
+        {
+            <h2 style="color: green;">TILLYKKE!</h2>
+        }
+        
+        <button class="btn btn-primary" @onclick="OnInitializedAsync">Prøv Igen</button>
+    }
+</center>
+</div>
+<canvas id="canvas"></canvas>
+
+@code {
+    private State state;
+    private int count;
+    private int rounds;
+    private int grid;
+    private int answer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        answer = 0;
+        count = 0;
+        rounds = 0;
+        state = State.NotStarted;
+        await JS.InvokeVoidAsync("displayNoConfetti");
+    }
+
+    private async Task StartGameAsync()
+    {
+        state = State.Started;
+        count = 0;
+        rounds = Random.Shared.Next(10) + 6;
+        for (int i = 0; i < rounds; i++)
+        {
+            if (i == rounds - 2)
+            {
+                grid = 7;
+            }
+            else
+            {
+                grid = Random.Shared.Next(5) + 2;
+            }
+
+            StateHasChanged();
+            await Task.Delay(4000);
+        }
+        grid = 0;
+        state = State.Answer;
+    }
+
+    private int GetNumber()
+    {
+        int number = Random.Shared.Next(9) + 10;
+        if (number == 14)
+        {
+            count++;
+        }
+        return number;
+    }
+
+    private async Task Answer()
+    {
+        await JS.InvokeVoidAsync("displayConfetti");
+        state = State.Finished;
+    }
+
+    private int CheckAnswer()
+    {
+        return Math.Abs(count - answer);
+    }
+
+    private enum State
+    {
+        NotStarted,
+        Started,
+        Answer,
+        Finished
+    }
+}
+
+
