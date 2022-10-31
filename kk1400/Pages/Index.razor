@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject IJSRuntime JS
+@inject NavigationManager NavManager
+
 <PageTitle>KK1400</PageTitle>
 <div>
 <center>
@@ -7,6 +9,7 @@
 
     @if (state == State.NotStarted)
     {
+        <p>Hvor mange 14 taller er der?</p>
         <button class="btn btn-primary" @onclick="StartGameAsync">Start Spillet</button>
     }
     else if (state == State.Started)
@@ -25,7 +28,7 @@
     }
     else if (state == State.Answer)
     {
-        <p>Hvor mange 14 taller var der?</p>
+        <p>Hvor mange 14 taller var der? @(cheat ? count : "")</p>
         <input @bind="answer" />
         <br />
         <br />
@@ -56,6 +59,7 @@
     private int rounds;
     private int grid;
     private int answer;
+    private bool cheat;
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,6 +68,14 @@
         rounds = 0;
         state = State.NotStarted;
         await JS.InvokeVoidAsync("displayNoConfetti");
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("cheat", out var _cheat))
+        {
+            cheat = Convert.ToBoolean(_cheat);
+        }
+        else{
+            cheat = false;
+        }
     }
 
     private async Task StartGameAsync()
