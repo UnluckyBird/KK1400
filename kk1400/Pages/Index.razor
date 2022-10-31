@@ -10,10 +10,23 @@
     @if (state == State.NotStarted)
     {
         <p>Hvor mange 14 taller er der?</p>
+        <div>
+            <label>
+                <input type="radio" name="dif" checked="@(difficulty == 0)" onchange="@((ChangeEventArgs args) => difficulty = 0)" /> Normalt
+            </label>
+            <label>
+                <input type="radio" name="dif" checked="@(difficulty == 1)" onchange="@((ChangeEventArgs args) => difficulty = 1)" /> Svært
+            </label>
+            <label>
+                <input type="radio" name="dif" checked="@(difficulty == 2)" onchange="@((ChangeEventArgs args) => difficulty = 2)" /> Umuligt
+            </label>
+        </div>
+        <br />
         <button class="btn btn-primary" @onclick="StartGameAsync">Start Spillet</button>
     }
     else if (state == State.Started)
     {
+        <p>difficulty: @difficulty</p>
         <div class="container" style="width:300px; height:300px;">
             @for (int i = 0; i < grid; i++)
             {
@@ -55,6 +68,7 @@
 
 @code {
     private State state;
+    private int difficulty = 0;
     private int count;
     private int rounds;
     private int grid;
@@ -66,6 +80,7 @@
         answer = 0;
         count = 0;
         rounds = 0;
+        difficulty = 0;
         state = State.NotStarted;
         await JS.InvokeVoidAsync("displayNoConfetti");
 
@@ -95,7 +110,18 @@
             }
 
             StateHasChanged();
-            await Task.Delay(4000);
+            if(difficulty == 1)
+            {
+                await Task.Delay(2750);
+            }
+            else if(difficulty == 2)
+            {
+                await Task.Delay(1500);
+            }
+            else
+            {
+                await Task.Delay(4000);
+            }   
         }
         grid = 0;
         state = State.Answer;
