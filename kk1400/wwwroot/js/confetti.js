@@ -1,4 +1,5 @@
-﻿var W = window.innerWidth;
+﻿//Slightly modified code from https://stackoverflow.com/questions/16322869/trying-to-create-a-confetti-effect-in-html5-how-do-i-get-a-different-fill-color
+var W = window.innerWidth;
 var H = window.innerHeight;
 var interval = null;
 
